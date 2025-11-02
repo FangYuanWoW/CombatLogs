@@ -1,0 +1,37 @@
+name: Build release zip and upload asset
+on:
+  release:
+    types: [created]
+
+permissions:
+  contents: write
+
+jobs:
+  build-and-upload:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Prepare distribution folder
+        run: |
+          # Create a top-level folder named 'CombatLogs' and copy repo files into it,
+          # excluding the .git dir, the .github workflows, and any existing dist folder.
+          rm -rf dist
+          mkdir -p dist/CombatLogs
+          rsync -a --exclude='.git' --exclude='.github' --exclude='dist' . dist/CombatLogs/
+
+      - name: Create zip (CombatLogs.zip)
+        run: |
+          cd dist
+          zip -r CombatLogs.zip CombatLogs
+
+      - name: Upload zip as release asset
+        uses: actions/upload-release-asset@v1
+        with:
+          upload_url: ${{ github.event.release.upload_url }}
+          asset_path: dist/CombatLogs.zip
+          asset_name: CombatLogs.zip
+          asset_content_type: application/zip
