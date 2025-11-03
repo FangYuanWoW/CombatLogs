@@ -6,8 +6,6 @@ CombatLogs = {}
 CombatLogs.frame = CreateFrame("Frame", "CombatLogsFrame")
 
 
-
-
 -- Set up event handler immediately
 CombatLogs.frame:SetScript("OnEvent", function(self, event, ...)
     if event == "ADDON_LOADED" then
@@ -67,11 +65,21 @@ end
 
 -- Check current zone and manage combat logging
 function CombatLogs:CheckZone()
+    -- First, sync our database state with actual combat logging state
+    local actuallyLogging = LoggingCombat()
+    if CombatLogsDB.currentZoneLogging ~= actuallyLogging then
+        CombatLogsDB.currentZoneLogging = actuallyLogging
+    end
+    
     local zoneName = GetZoneText()
     local instanceName, instanceType = GetInstanceInfo()
     
     -- Use instance name if available, otherwise use zone name
     local currentZone = instanceName ~= "" and instanceName or zoneName
+    
+    if not CombatLogsDB.zones then
+        return
+    end
     
     -- Check if current zone is in our monitored zones list (case-insensitive)
     local shouldLog = false
@@ -101,9 +109,9 @@ function CombatLogs:StartCombatLog(zoneName)
     end
     
     -- Start combat logging by executing the /combatlog command
+    self:Print("Combat being logged to Logs\\WoWCombatLog.txt for " .. zoneName)
     SlashCmdList["COMBATLOG"]("")
     CombatLogsDB.currentZoneLogging = true
-    self:Print("Combat logging started for: " .. zoneName)
 end
 
 -- Stop combat logging
