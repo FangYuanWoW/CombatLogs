@@ -32,7 +32,15 @@ local defaults = {
     zones = {
         ["Zul'Gurub"] = true,
         ["Molten Core"] = true,
+        ["Ruins of Ahn'Qiraj"] = true,
+        ["Temple of Ahn'Qiraj"] = true,
         ["Blackwing Lair"] = true,
+        ["Ahn'Qiraj"] = true,
+        ["Naxxramas"] = true,
+        ["Azuregos (PvE)"] = true,
+        ["Master's Gastric Pit"] = true,
+        ["The Scarab Wall"] = true,
+        ["The Scarab Dais"] = true,             
         },
     currentZoneLogging = false,
     debugMode = false
