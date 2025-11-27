@@ -40,7 +40,10 @@ local defaults = {
         ["Azuregos (PvE)"] = true,
         ["Master's Gastric Pit"] = true,
         ["The Scarab Wall"] = true,
-        ["The Scarab Dais"] = true,             
+        ["The Scarab Dais"] = true,
+        ["Kazzak (PvE)"] = true,
+        ["Lord Kazzak (PvE)"] = true,
+        ["Soggoth (PvE)"] = true,
         },
     currentZoneLogging = false,
     debugMode = false
@@ -289,4 +292,5 @@ SlashCmdList["COMBATLOGS"] = function(msg)
     else
         CombatLogs:Print("Unknown command: '" .. command .. "'. Type /combatlogs help for available commands.")
     end
+
 end
