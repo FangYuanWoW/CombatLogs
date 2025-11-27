@@ -14,7 +14,7 @@ A World of Warcraft 3.3.5 addon that automatically manages combat logging based 
 ## Installation
 
 1. Extract the `CombatLogs` folder to your `Interface\AddOns\` directory
-2. Rename the folder to "Combatlogs"
+2. Rename the folder to `CombatLogs`
 3. Restart WoW or type `/reload`
 4. The addon will load automatically with default zones pre-configured
 
@@ -130,4 +130,5 @@ WTF\Account\[YourAccountName]\SavedVariables\CombatLogs.lua
 ## Support
 
 For issues or feature requests, check your addon configuration and ensure all files are properly installed in the AddOns directory.
+
 
