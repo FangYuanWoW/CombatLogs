@@ -382,6 +382,18 @@ function CombatLogs:ToggleDebug()
     self:Print("Debug mode: " .. (CombatLogsDB.debugMode and "enabled" or "disabled"))
 end
 
+-- Toggle auto-logging mode
+function CombatLogs:ToggleEnabled()
+    CombatLogsDB.enabled = not CombatLogsDB.enabled
+    if not CombatLogsDB.enabled then
+        -- If disabling, also stop combat logging if active
+        self:StopCombatLog()
+    else
+        self:CheckZone(false)
+    end
+    self:Debug("Combat Logs autologging is now " .. (CombatLogsDB.enabled and "active" or "disabled"))
+end
+
 -- Get current zone name
 function CombatLogs:GetCurrentZone()
     local zoneName = GetZoneText()
@@ -470,7 +482,11 @@ SlashCmdList["COMBATLOGS"] = function(msg)
     elseif command == "current" then
         CombatLogs:GetCurrentZone()
     elseif command == "status" then
-        CombatLogs:Print("Combat Logs Manager is always active")
+        if CombatLogsDB.enabled == true then
+            CombatLogs:Print("Combat Logs Manager auto logging is active")
+        else
+            CombatLogs:Print("Combat Logs Manager auto logging is disabled, enable it again in /combatlogs gui")
+        end
         CombatLogs:Print("Currently logging: " .. (CombatLogsDB.currentZoneLogging and "yes" or "no"))
         CombatLogs:Print("Debug mode: " .. (CombatLogsDB.debugMode and "enabled" or "disabled"))
     elseif command == "debug" then
