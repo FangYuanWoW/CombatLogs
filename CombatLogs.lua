@@ -257,7 +257,7 @@ function CombatLogs:CheckZone(showPopup)
             CombatLogs.leavingPopupShown = false
             StaticPopup_Hide("COMBATLOGS_LEAVING_ZONE")
             CombatLogsDB.lastLoggedZone = currentZone
-            self:Print("Still logging for: " .. currentZone)
+            self:Print("Combat logs enabled for zone: " .. currentZone)
         end
     elseif not shouldLog and CombatLogsDB.currentZoneLogging and showPopup then
         -- Leaving a monitored zone while logging - only show popup on major zone change
@@ -294,7 +294,7 @@ end
 function CombatLogs:StartCombatLog(zoneName)
     -- Check if combat logging is already active
     if LoggingCombat() then
-        self:Print("Combat logging already active for: " .. zoneName)
+        self:Debug("Combat logging already active for: " .. zoneName)
         CombatLogsDB.currentZoneLogging = true
         CombatLogsDB.lastLoggedZone = zoneName
         return
@@ -314,7 +314,7 @@ end
 function CombatLogs:StopCombatLog()
     -- Check if combat logging is actually active before stopping
     if not LoggingCombat() then
-        self:Print("Combat logging was already stopped")
+        self:Debug("Combat logging was already stopped")
         CombatLogsDB.currentZoneLogging = false
         return
     end
