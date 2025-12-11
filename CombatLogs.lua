@@ -407,6 +407,13 @@ function CombatLogs:Print(msg)
     end
 end
 
+-- Debug print function
+function CombatLogs:Debug(msg)
+    if CombatLogsDB.debugMode then
+        self:Print("[DEBUG] " .. msg)
+    end
+end
+
 -- Slash command handler
 SLASH_COMBATLOGS1 = "/combatlogs"
 SLASH_COMBATLOGS2 = "/cl"
