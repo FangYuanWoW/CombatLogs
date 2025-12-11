@@ -160,7 +160,8 @@ local defaults = {
         ["Soggoth (PvE)"] = true,
         },
     currentZoneLogging = false,
-    debugMode = false
+    debugMode = false,
+    enabled = true,
 }
 
 -- Database reference
