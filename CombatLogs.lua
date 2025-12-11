@@ -121,16 +121,24 @@ CombatLogs.frame:SetScript("OnEvent", function(self, event, ...)
         if addonName == "CombatLogs" then
             CombatLogs:Initialize()
         end
-    elseif event == "ZONE_CHANGED_NEW_AREA" then
-        -- Only check zone on major zone changes (after loading screen)
-        if CombatLogs.CheckZone then
-            CombatLogs:CheckZone(event)
+    end
+    -- Stop handling events if user disabled the addon via GUI
+    if CombatLogsDB then
+        if not CombatLogsDB.enabled then
+            return 
         end
-    elseif event == "ZONE_CHANGED" or event == "ZONE_CHANGED_INDOORS" or event == "PLAYER_ENTERING_WORLD" then
-        -- For other events, just check without popup prompts
-        if CombatLogs.CheckZone then
-            CombatLogs:CheckZone(event)
-        end
+    end
+    local zoneEvents = {
+        ZONE_CHANGED_NEW_AREA = true,
+        ZONE_CHANGED = true,
+        ZONE_CHANGED_INDOORS = true,
+        PLAYER_ENTERING_WORLD = true,
+    }
+
+    if CombatLogs.CheckZone and zoneEvents[event] then
+        local showPopup = (event == "ZONE_CHANGED_NEW_AREA")  -- Don't show popup for minor zone changes
+        CombatLogs:Debug("Event triggered: " .. event .. ", showPopup=" .. tostring(showPopup))
+        CombatLogs:CheckZone(showPopup)
     end
 end)
 
@@ -190,7 +198,7 @@ function CombatLogs:Initialize()
 end
 
 -- Check current zone and manage combat logging
-function CombatLogs:CheckZone(event)
+function CombatLogs:CheckZone(showPopup)
     -- First, sync our database state with actual combat logging state
     local actuallyLogging = LoggingCombat()
     if CombatLogsDB.currentZoneLogging ~= actuallyLogging then
@@ -251,7 +259,7 @@ function CombatLogs:CheckZone(event)
             CombatLogsDB.lastLoggedZone = currentZone
             self:Print("Still logging for: " .. currentZone)
         end
-    elseif not shouldLog and CombatLogsDB.currentZoneLogging and event == "ZONE_CHANGED_NEW_AREA" then
+    elseif not shouldLog and CombatLogsDB.currentZoneLogging and showPopup then
         -- Leaving a monitored zone while logging - only show popup on major zone change
         -- Only show popup if we haven't already shown it
         if not CombatLogs.leavingPopupShown then
