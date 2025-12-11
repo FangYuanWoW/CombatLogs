@@ -121,16 +121,24 @@ CombatLogs.frame:SetScript("OnEvent", function(self, event, ...)
         if addonName == "CombatLogs" then
             CombatLogs:Initialize()
         end
-    elseif event == "ZONE_CHANGED_NEW_AREA" then
-        -- Only check zone on major zone changes (after loading screen)
-        if CombatLogs.CheckZone then
-            CombatLogs:CheckZone(event)
+    end
+    -- Stop handling events if user disabled the addon via GUI
+    if CombatLogsDB then
+        if not CombatLogsDB.enabled then
+            return 
         end
-    elseif event == "ZONE_CHANGED" or event == "ZONE_CHANGED_INDOORS" or event == "PLAYER_ENTERING_WORLD" then
-        -- For other events, just check without popup prompts
-        if CombatLogs.CheckZone then
-            CombatLogs:CheckZone(event)
-        end
+    end
+    local zoneEvents = {
+        ZONE_CHANGED_NEW_AREA = true,
+        ZONE_CHANGED = true,
+        ZONE_CHANGED_INDOORS = true,
+        PLAYER_ENTERING_WORLD = true,
+    }
+
+    if CombatLogs.CheckZone and zoneEvents[event] then
+        local showPopup = (event == "ZONE_CHANGED_NEW_AREA")  -- Don't show popup for minor zone changes
+        CombatLogs:Debug("Event triggered: " .. event .. ", showPopup=" .. tostring(showPopup))
+        CombatLogs:CheckZone(showPopup)
     end
 end)
 
@@ -160,7 +168,8 @@ local defaults = {
         ["Soggoth (PvE)"] = true,
         },
     currentZoneLogging = false,
-    debugMode = false
+    debugMode = false,
+    enabled = true,
 }
 
 -- Database reference
@@ -189,7 +198,7 @@ function CombatLogs:Initialize()
 end
 
 -- Check current zone and manage combat logging
-function CombatLogs:CheckZone(event)
+function CombatLogs:CheckZone(showPopup)
     -- First, sync our database state with actual combat logging state
     local actuallyLogging = LoggingCombat()
     if CombatLogsDB.currentZoneLogging ~= actuallyLogging then
@@ -248,9 +257,9 @@ function CombatLogs:CheckZone(event)
             CombatLogs.leavingPopupShown = false
             StaticPopup_Hide("COMBATLOGS_LEAVING_ZONE")
             CombatLogsDB.lastLoggedZone = currentZone
-            self:Print("Still logging for: " .. currentZone)
+            self:Print("Combat logs enabled for zone: " .. currentZone)
         end
-    elseif not shouldLog and CombatLogsDB.currentZoneLogging and event == "ZONE_CHANGED_NEW_AREA" then
+    elseif not shouldLog and CombatLogsDB.currentZoneLogging and showPopup then
         -- Leaving a monitored zone while logging - only show popup on major zone change
         -- Only show popup if we haven't already shown it
         if not CombatLogs.leavingPopupShown then
@@ -285,7 +294,7 @@ end
 function CombatLogs:StartCombatLog(zoneName)
     -- Check if combat logging is already active
     if LoggingCombat() then
-        self:Print("Combat logging already active for: " .. zoneName)
+        self:Debug("Combat logging already active for: " .. zoneName)
         CombatLogsDB.currentZoneLogging = true
         CombatLogsDB.lastLoggedZone = zoneName
         return
@@ -305,7 +314,7 @@ end
 function CombatLogs:StopCombatLog()
     -- Check if combat logging is actually active before stopping
     if not LoggingCombat() then
-        self:Print("Combat logging was already stopped")
+        self:Debug("Combat logging was already stopped")
         CombatLogsDB.currentZoneLogging = false
         return
     end
@@ -373,6 +382,18 @@ function CombatLogs:ToggleDebug()
     self:Print("Debug mode: " .. (CombatLogsDB.debugMode and "enabled" or "disabled"))
 end
 
+-- Toggle auto-logging mode
+function CombatLogs:ToggleEnabled()
+    CombatLogsDB.enabled = not CombatLogsDB.enabled
+    if not CombatLogsDB.enabled then
+        -- If disabling, also stop combat logging if active
+        self:StopCombatLog()
+    else
+        self:CheckZone(false)
+    end
+    self:Debug("Combat Logs autologging is now " .. (CombatLogsDB.enabled and "active" or "disabled"))
+end
+
 -- Get current zone name
 function CombatLogs:GetCurrentZone()
     local zoneName = GetZoneText()
@@ -403,6 +424,13 @@ function CombatLogs:Print(msg)
     end
     if DEFAULT_CHAT_FRAME.editBox and DEFAULT_CHAT_FRAME.editBox:IsVisible() then
         DEFAULT_CHAT_FRAME.editBox:Hide()
+    end
+end
+
+-- Debug print function
+function CombatLogs:Debug(msg)
+    if CombatLogsDB.debugMode then
+        self:Print("[DEBUG] " .. msg)
     end
 end
 
@@ -454,7 +482,11 @@ SlashCmdList["COMBATLOGS"] = function(msg)
     elseif command == "current" then
         CombatLogs:GetCurrentZone()
     elseif command == "status" then
-        CombatLogs:Print("Combat Logs Manager is always active")
+        if CombatLogsDB.enabled == true then
+            CombatLogs:Print("Combat Logs Manager auto logging is active")
+        else
+            CombatLogs:Print("Combat Logs Manager auto logging is disabled, enable it again in /combatlogs gui")
+        end
         CombatLogs:Print("Currently logging: " .. (CombatLogsDB.currentZoneLogging and "yes" or "no"))
         CombatLogs:Print("Debug mode: " .. (CombatLogsDB.debugMode and "enabled" or "disabled"))
     elseif command == "debug" then
