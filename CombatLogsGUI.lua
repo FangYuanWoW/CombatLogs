@@ -11,7 +11,7 @@ function GUI:CreateMainFrame()
     
     -- Main frame
     local frame = CreateFrame("Frame", "CombatLogsMainFrame", UIParent)
-    frame:SetSize(400, 300)
+    frame:SetSize(360, 330)
     frame:SetPoint("CENTER")
     frame:SetBackdrop({
         bgFile = "Interface\\DialogFrame\\UI-DialogBox-Background",
@@ -88,10 +88,10 @@ function GUI:CreateMainFrame()
     -- Zone list scroll frame
     local scrollFrame = CreateFrame("ScrollFrame", "CombatLogsZoneScrollFrame", frame, "UIPanelScrollFrameTemplate")
     scrollFrame:SetPoint("TOPLEFT", zoneLabel, "BOTTOMLEFT", 0, -5)
-    scrollFrame:SetSize(250, 100)
+    scrollFrame:SetSize(300, 100)
     
     local zoneListFrame = CreateFrame("Frame", nil, scrollFrame)
-    zoneListFrame:SetSize(250, 100)
+    zoneListFrame:SetSize(300, 100)
     scrollFrame:SetScrollChild(zoneListFrame)
     
     -- Add zone input
@@ -182,10 +182,9 @@ function GUI:UpdateZoneList()
         zoneText:SetJustifyH("LEFT")
         zoneText:SetSize(180, 20)
         
-        local removeButton = CreateFrame("Button", nil, zoneFrame, "UIPanelButtonTemplate")
-        removeButton:SetSize(50, 18)
+        local removeButton = CreateFrame("Button", nil, zoneFrame, "UIPanelCloseButton")
+        removeButton:SetSize(20, 20)
         removeButton:SetPoint("RIGHT", zoneFrame, "RIGHT", -5, 0)
-        removeButton:SetText("Remove")
         removeButton:SetScript("OnClick", function()
             CombatLogs:RemoveZone(zoneName)
             GUI:UpdateZoneList()
