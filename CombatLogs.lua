@@ -152,7 +152,7 @@ CombatLogs.frame:RegisterEvent("PLAYER_ENTERING_WORLD")
 -- Default settings
 local defaults = {
     zones = {
-       ["Zul'Gurub"] = true,
+        ["Zul'Gurub"] = true,
         ["Molten Core"] = true,
         ["Ruins of Ahn'Qiraj"] = true,
         ["Temple of Ahn'Qiraj"] = true,
@@ -170,8 +170,7 @@ local defaults = {
         ["Taerar (PvE)"] = true,
         ["Ysondre (PvE)"] = true,
         ["Soggoth (PvE)"] = true,
-        ["Kaldros (PvE)"] = true,
-        ["Kaladros (PvE)"] = true,
+        ["Kaldros Depthbreaker (PvE)"] = true,
         ["Master's Gastric Pit"] = true,
         ["The Scarab Wall"] = true,
         ["The Scarab Dais"] = true,
